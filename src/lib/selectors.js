@@ -33,26 +33,14 @@ export function aggregateByDest(destinations, hourIdx) {
   return rows;
 }
 
-// 선택 시간대 기준 수단별 합계
-export function modeBreakdown(destinations, hourIdx, modeLabels) {
-  const totals = {};
-  for (const d of destinations) {
-    if (hourIdx < 0) {
-      for (const [m, v] of Object.entries(d.byMode)) {
-        totals[m] = (totals[m] || 0) + v;
-      }
-    }
-    // 시간대별 수단 분해는 전처리에 없으므로 전체 기준만 정확.
-    // 시간 필터 시에는 비율을 byHour 기준으로 근사 스케일.
-  }
-  if (hourIdx >= 0) {
-    // 전체 수단 비율을 해당 시간대 총량에 맞춰 스케일 (근사)
-    const hourTotal = destinations.reduce((s, d) => s + (d.byHour[hourIdx] || 0), 0);
-    const allTotal = Object.values(totals).reduce((s, v) => s + v, 0) || 1;
-    for (const m of Object.keys(totals)) {
-      totals[m] = (totals[m] / allTotal) * hourTotal;
-    }
-  }
+// 선택 시간대 기준 수단별 합계 (정확: summary.hour_mode 사용)
+export function modeBreakdown(summary, hourIdx, modeLabels) {
+  // hourIdx < 0 → 전체(mode_totals), 그 외 → 해당 시간대(hour_mode[hourIdx])
+  const totals =
+    hourIdx < 0
+      ? { ...summary.mode_totals }
+      : { ...(summary.hour_mode?.[hourIdx] || {}) };
+
   const arr = Object.entries(totals)
     .map(([code, value]) => ({
       code,

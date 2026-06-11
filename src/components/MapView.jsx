@@ -32,6 +32,35 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       maxZoom: 18,
     }).addTo(map);
 
+    // 서울 자치구 경계 + 구명 라벨 (흐름선보다 아래에 깔림)
+    fetch('seoul_gu.geojson')
+      .then((r) => r.json())
+      .then((geo) => {
+        if (!mapRef.current) return;
+        L.geoJSON(geo, {
+          style: {
+            color: '#3a4a63',
+            weight: 1,
+            opacity: 0.7,
+            fillColor: '#4a5a78',
+            fillOpacity: 0.04,
+          },
+        }).addTo(map);
+        // 구 이름 라벨 (폴리곤 중심)
+        geo.features.forEach((f) => {
+          const c = L.geoJSON(f).getBounds().getCenter();
+          L.marker(c, {
+            interactive: false,
+            icon: L.divIcon({
+              className: '',
+              html: `<span style="color:#7d8ba3;font-size:10px;font-weight:600;text-shadow:0 0 4px #0d1117,0 0 4px #0d1117;white-space:nowrap;">${f.properties.name}</span>`,
+              iconAnchor: [0, 0],
+            }),
+          }).addTo(map);
+        });
+      })
+      .catch(() => {});
+
     // 출발지 마커
     const originIcon = L.divIcon({
       html: '<div style="width:16px;height:16px;background:#ff6b6b;border:2px solid #fff;border-radius:50%;box-shadow:0 0 12px #ff6b6b;"></div>',

@@ -62,6 +62,8 @@ async function processDay(day) {
 
   // dest_code -> { name, lat, lon, byHour:Map, byMode:Map, total }
   const dests = new Map();
+  // 시간대 × 수단 매트릭스 (정확한 시간대별 수단 분포용): hourMode[hour][modeCode]
+  const hourMode = Array.from({ length: 24 }, () => ({}));
   // 검증용 총합
   let grandTotal = 0;
   let rowCount = 0;
@@ -109,6 +111,7 @@ async function processDay(day) {
     d.total += pop;
     d.byHour[hour] += pop;
     d.byMode[mode] = (d.byMode[mode] || 0) + pop;
+    hourMode[hour][mode] = (hourMode[hour][mode] || 0) + pop;
   }
 
   // 정리: 도착지별 배열, byHour 반올림
@@ -156,6 +159,10 @@ async function processDay(day) {
       hour_totals: hourTotals.map(round1),
       mode_totals: Object.fromEntries(
         Object.entries(modeTotals).map(([k, v]) => [k, round1(v)])
+      ),
+      // 시간대별 정확한 수단 분포: hour_mode[hour] = { modeCode: cnt }
+      hour_mode: hourMode.map((mObj) =>
+        Object.fromEntries(Object.entries(mObj).map(([k, v]) => [k, round1(v)]))
       ),
     },
     destinations,

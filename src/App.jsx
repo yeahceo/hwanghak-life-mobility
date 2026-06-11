@@ -37,7 +37,7 @@ export default function App() {
     [data, hour]
   );
   const modes = useMemo(
-    () => (data ? modeBreakdown(data.destinations, hour, data.meta.mode_labels) : []),
+    () => (data ? modeBreakdown(data.summary, hour, data.meta.mode_labels) : []),
     [data, hour]
   );
   const series = useMemo(() => (data ? hourSeries(data) : []), [data]);
