@@ -1,23 +1,27 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { ORIGIN, isSeoul } from '../lib/selectors';
+import { ORIGIN, isSeoul, shortName } from '../lib/selectors';
 
-// 베지어 곡선 아크 (친구 drawArc 이식)
-function arcPoints(lat1, lon1, lat2, lon2, steps = 30) {
-  const pts = [];
+// 베지어 곡선 한 점 평가 (t: 0~1)
+function bezierAt(lat1, lon1, lat2, lon2, t) {
   const midLat = (lat1 + lat2) / 2 + (lon2 - lon1) * 0.15;
   const midLon = (lon1 + lon2) / 2 - (lat2 - lat1) * 0.15;
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const lat = (1 - t) * (1 - t) * lat1 + 2 * (1 - t) * t * midLat + t * t * lat2;
-    const lon = (1 - t) * (1 - t) * lon1 + 2 * (1 - t) * t * midLon + t * t * lon2;
-    pts.push([lat, lon]);
-  }
+  const lat = (1 - t) * (1 - t) * lat1 + 2 * (1 - t) * t * midLat + t * t * lat2;
+  const lon = (1 - t) * (1 - t) * lon1 + 2 * (1 - t) * t * midLon + t * t * lon2;
+  return [lat, lon];
+}
+
+// 곡선 폴리라인 좌표 (친구 drawArc 이식)
+function arcPoints(lat1, lon1, lat2, lon2, steps = 30) {
+  const pts = [];
+  for (let i = 0; i <= steps; i++) pts.push(bezierAt(lat1, lon1, lat2, lon2, i / steps));
   return pts;
 }
 
 export default function MapView({ byDest, originName, onPickDest, mapRef }) {
   const layersRef = useRef([]);
+  const dotsRef = useRef([]);      // 흐르는 점 마커들
+  const animRef = useRef(null);    // requestAnimationFrame id
   const containerRef = useRef(null);
 
   // 지도 1회 초기화
@@ -74,14 +78,19 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
     return () => { map.remove(); mapRef.current = null; };
   }, [originName]);
 
-  // byDest 변경 시 흐름선·마커 다시 그림
+  // byDest 변경 시 흐름선·마커·라벨·흐르는 점 다시 그림
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
     layersRef.current.forEach((l) => map.removeLayer(l));
     layersRef.current = [];
+    dotsRef.current.forEach((d) => map.removeLayer(d.marker));
+    dotsRef.current = [];
 
     const max = byDest[0]?.value || 1;
+    // TOP10 도착지 코드 (라벨 표시 대상)
+    const top10 = new Set(byDest.slice(0, 10).map((d) => d.dest_code));
+
     byDest.slice(0, 40).forEach((d) => {
       if (d.dest_lat == null || d.dest_lon == null) return;
       const ratio = d.value / max;
@@ -106,8 +115,58 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
         .bindPopup(`<b>${d.dest_name}</b><br>이동인구: <b>${d.value.toLocaleString()}명</b>`);
       marker.on('click', () => onPickDest?.(d));
       layersRef.current.push(marker);
+
+      // TOP10만 동 이름 라벨 (점 옆에 표시)
+      if (top10.has(d.dest_code)) {
+        const label = L.marker([d.dest_lat, d.dest_lon], {
+          interactive: false,
+          icon: L.divIcon({
+            className: '',
+            html: `<span style="display:inline-block;margin-left:${r + 4}px;color:${color};font-size:11px;font-weight:700;text-shadow:0 0 4px #0d1117,0 0 4px #0d1117,0 0 4px #0d1117;white-space:nowrap;">${shortName(d.dest_name)}</span>`,
+            iconAnchor: [0, 8],
+          }),
+        }).addTo(map);
+        layersRef.current.push(label);
+      }
+
+      // 흐르는 점: 상위 30개 흐름선만 (성능), 인구 비례 점 개수
+      if (ratio > 0.04) {
+        const dotCount = Math.min(4, 1 + Math.floor(ratio * 4));
+        for (let k = 0; k < dotCount; k++) {
+          const m = L.marker([ORIGIN.lat, ORIGIN.lon], {
+            interactive: false,
+            icon: L.divIcon({
+              className: '',
+              html: `<div style="width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 6px ${color},0 0 3px ${color};"></div>`,
+              iconAnchor: [2.5, 2.5],
+            }),
+          }).addTo(map);
+          dotsRef.current.push({
+            marker: m,
+            o: [ORIGIN.lat, ORIGIN.lon],
+            dst: [d.dest_lat, d.dest_lon],
+            t: k / dotCount,          // 시작 위치 분산
+            speed: 0.0016 + ratio * 0.0014, // 인구 많을수록 약간 빠르게
+          });
+        }
+      }
     });
   }, [byDest, onPickDest]);
+
+  // 흐르는 점 애니메이션 루프 (마운트 시 1회 시작, 점은 dotsRef에서 읽음)
+  useEffect(() => {
+    const step = () => {
+      for (const dot of dotsRef.current) {
+        dot.t += dot.speed;
+        if (dot.t > 1) dot.t -= 1;
+        const [lat, lon] = bezierAt(dot.o[0], dot.o[1], dot.dst[0], dot.dst[1], dot.t);
+        dot.marker.setLatLng([lat, lon]);
+      }
+      animRef.current = requestAnimationFrame(step);
+    };
+    animRef.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animRef.current);
+  }, []);
 
   return <div id="map" ref={containerRef} />;
 }

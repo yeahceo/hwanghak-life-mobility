@@ -7,6 +7,7 @@ import DestTop10 from './components/DestTop10';
 import DayToggle from './components/DayToggle';
 import CountUp from './components/CountUp';
 import Glow from './components/Glow';
+import CursorGlow from './components/CursorGlow';
 import { aggregateByDest, modeBreakdown, hourSeries } from './lib/selectors';
 
 // 참고 코드(친구) 무드: blur-in 리빌 + 커스텀 easing
@@ -65,6 +66,7 @@ export default function App() {
 
   return (
     <>
+      <CursorGlow color="#58a6ff" size={440} opacity={0.1} />
       <motion.header
         initial={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
