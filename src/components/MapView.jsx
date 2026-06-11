@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { ORIGIN, isSeoul, shortName } from '../lib/selectors';
+import { ORIGIN, isSeoul } from '../lib/selectors';
 
 // 베지어 곡선 한 점 평가 (t: 0~1)
 function bezierAt(lat1, lon1, lat2, lon2, t) {
@@ -36,7 +36,7 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       maxZoom: 18,
     }).addTo(map);
 
-    // 서울 자치구 경계 + 구명 라벨 (흐름선보다 아래에 깔림)
+    // 서울 자치구 경계 (흐름선보다 아래에 깔림, 구 이름 라벨은 표시 안 함)
     fetch('seoul_gu.geojson')
       .then((r) => r.json())
       .then((geo) => {
@@ -50,18 +50,6 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
             fillOpacity: 0.04,
           },
         }).addTo(map);
-        // 구 이름 라벨 (폴리곤 중심)
-        geo.features.forEach((f) => {
-          const c = L.geoJSON(f).getBounds().getCenter();
-          L.marker(c, {
-            interactive: false,
-            icon: L.divIcon({
-              className: '',
-              html: `<span style="color:#7d8ba3;font-size:10px;font-weight:600;text-shadow:0 0 4px #0d1117,0 0 4px #0d1117;white-space:nowrap;">${f.properties.name}</span>`,
-              iconAnchor: [0, 0],
-            }),
-          }).addTo(map);
-        });
       })
       .catch(() => {});
 
@@ -88,8 +76,6 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
     dotsRef.current = [];
 
     const max = byDest[0]?.value || 1;
-    // TOP10 도착지 코드 (라벨 표시 대상)
-    const top10 = new Set(byDest.slice(0, 10).map((d) => d.dest_code));
 
     byDest.slice(0, 40).forEach((d) => {
       if (d.dest_lat == null || d.dest_lon == null) return;
@@ -98,69 +84,62 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       const color = seoul ? '#4ecdc4' : '#ffe66d';
       const weight = Math.max(1, ratio * 6);
       const opacity = 0.3 + ratio * 0.6;
+      const pts = arcPoints(ORIGIN.lat, ORIGIN.lon, d.dest_lat, d.dest_lon);
 
-      const line = L.polyline(
-        arcPoints(ORIGIN.lat, ORIGIN.lon, d.dest_lat, d.dest_lon),
-        { color, weight, opacity, smoothFactor: 1 }
-      ).addTo(map);
-      layersRef.current.push(line);
+      // 글로우용 굵고 흐린 선 (아래에 깔림)
+      const glowLine = L.polyline(pts, {
+        color,
+        weight: weight + 6,
+        opacity: opacity * 0.25,
+        smoothFactor: 1,
+        interactive: false,
+      }).addTo(map);
+      layersRef.current.push(glowLine);
 
-      const r = Math.max(4, ratio * 14);
-      const icon = L.divIcon({
-        html: `<div style="width:${r * 2}px;height:${r * 2}px;background:${color};opacity:0.85;border-radius:50%;margin:${-r}px 0 0 ${-r}px;border:1px solid rgba(255,255,255,0.35);"></div>`,
-        className: '', iconAnchor: [0, 0],
-      });
-      const marker = L.marker([d.dest_lat, d.dest_lon], { icon })
+      // 본선 (클릭 가능 — 도착지 정보 팝업)
+      const line = L.polyline(pts, { color, weight, opacity, smoothFactor: 1 })
         .addTo(map)
         .bindPopup(`<b>${d.dest_name}</b><br>이동인구: <b>${d.value.toLocaleString()}명</b>`);
-      marker.on('click', () => onPickDest?.(d));
-      layersRef.current.push(marker);
+      line.on('click', () => onPickDest?.(d));
+      layersRef.current.push(line);
 
-      // TOP10만 동 이름 라벨 (점 옆에 표시)
-      if (top10.has(d.dest_code)) {
-        const label = L.marker([d.dest_lat, d.dest_lon], {
-          interactive: false,
-          icon: L.divIcon({
-            className: '',
-            html: `<span style="display:inline-block;margin-left:${r + 4}px;color:${color};font-size:11px;font-weight:700;text-shadow:0 0 4px #0d1117,0 0 4px #0d1117,0 0 4px #0d1117;white-space:nowrap;">${shortName(d.dest_name)}</span>`,
-            iconAnchor: [0, 8],
-          }),
-        }).addTo(map);
-        layersRef.current.push(label);
-      }
-
-      // 흐르는 점: 상위 30개 흐름선만 (성능), 인구 비례 점 개수
+      // 흐르는 점: 상위 흐름선만 (성능), 인구 비례 점 개수
       if (ratio > 0.04) {
         const dotCount = Math.min(4, 1 + Math.floor(ratio * 4));
         for (let k = 0; k < dotCount; k++) {
+          const el = document.createElement('div');
+          el.style.cssText = `width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 6px ${color},0 0 3px ${color};`;
           const m = L.marker([ORIGIN.lat, ORIGIN.lon], {
             interactive: false,
-            icon: L.divIcon({
-              className: '',
-              html: `<div style="width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 6px ${color},0 0 3px ${color};"></div>`,
-              iconAnchor: [2.5, 2.5],
-            }),
+            icon: L.divIcon({ className: '', html: el.outerHTML, iconAnchor: [2.5, 2.5] }),
           }).addTo(map);
           dotsRef.current.push({
             marker: m,
             o: [ORIGIN.lat, ORIGIN.lon],
             dst: [d.dest_lat, d.dest_lon],
-            t: k / dotCount,          // 시작 위치 분산
-            speed: 0.0016 + ratio * 0.0014, // 인구 많을수록 약간 빠르게
+            t: k / dotCount,                 // 시작 위치 분산
+            speed: 0.10 + ratio * 0.06,      // 초당 진행률 (느리고 부드럽게)
           });
         }
       }
     });
   }, [byDest, onPickDest]);
 
-  // 흐르는 점 애니메이션 루프 (마운트 시 1회 시작, 점은 dotsRef에서 읽음)
+  // 흐르는 점 애니메이션 루프 — delta time 기반(프레임률 무관, 부드러움)
   useEffect(() => {
-    const step = () => {
+    let last = performance.now();
+    const step = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000); // 초 단위, 탭 비활성 시 점프 방지
+      last = now;
       for (const dot of dotsRef.current) {
-        dot.t += dot.speed;
+        dot.t += dot.speed * dt;
         if (dot.t > 1) dot.t -= 1;
         const [lat, lon] = bezierAt(dot.o[0], dot.o[1], dot.dst[0], dot.dst[1], dot.t);
         dot.marker.setLatLng([lat, lon]);
+        // 시작·끝 근처에서 부드럽게 페이드 (꼬리처럼)
+        const fade = Math.sin(dot.t * Math.PI); // 0→1→0
+        const elDot = dot.marker.getElement();
+        if (elDot) elDot.style.opacity = (0.35 + fade * 0.65).toFixed(2);
       }
       animRef.current = requestAnimationFrame(step);
     };
