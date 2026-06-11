@@ -7,8 +7,8 @@ export default function CursorGlow({ color = '#58a6ff', size = 420, opacity = 0.
   const mx = useMotionValue(-9999);
   const my = useMotionValue(-9999);
   // 살짝 지연되어 따라오는 부드러운 추적
-  const sx = useSpring(mx, { stiffness: 120, damping: 22, mass: 0.4 });
-  const sy = useSpring(my, { stiffness: 120, damping: 22, mass: 0.4 });
+  const sx = useSpring(mx, { stiffness: 90, damping: 26, mass: 0.6 });
+  const sy = useSpring(my, { stiffness: 90, damping: 26, mass: 0.6 });
 
   useEffect(() => {
     const move = (e) => {

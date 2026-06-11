@@ -15,7 +15,7 @@ export default function SegToggle({ options, value, onChange, layoutId }) {
               layoutId={layoutId}
               className="pill"
               style={{ left: 0, right: 0 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 30 }}
             />
           )}
           <span style={{ position: 'relative', zIndex: 1 }}>{o.label}</span>

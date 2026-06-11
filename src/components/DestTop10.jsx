@@ -19,7 +19,7 @@ export default function DestTop10({ byDest, onPick }) {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ layout: { duration: 0.35 }, duration: 0.2 }}
+              transition={{ layout: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }, duration: 0.35 }}
               onClick={() => onPick?.(d)}
             >
               <span className="dest-rank">{i + 1}</span>
@@ -29,7 +29,7 @@ export default function DestTop10({ byDest, onPick }) {
                   className="dest-bar"
                   style={{ background: color }}
                   animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
                 />
               </div>
               <span className="dest-val">{Math.round(d.value).toLocaleString()}</span>

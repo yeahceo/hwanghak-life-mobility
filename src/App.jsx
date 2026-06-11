@@ -17,10 +17,10 @@ import {
 } from './lib/selectors';
 
 const EASE = [0.25, 0.46, 0.45, 0.94];
-const SECTIONS = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } };
+const SECTIONS = { hidden: {}, show: { transition: { staggerChildren: 0.11, delayChildren: 0.08 } } };
 const ITEM = {
-  hidden: { opacity: 0, y: 12, filter: 'blur(6px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.85, ease: EASE } },
+  hidden: { opacity: 0, y: 18, filter: 'blur(8px)' },
+  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: EASE } },
 };
 
 const MONTHS = [{ key: 'jan', label: '1월' }, { key: 'apr', label: '4월' }];
@@ -84,10 +84,10 @@ export default function App() {
 
       <div className="layout">
         <motion.div
-          style={{ gridColumn: 1, height: '100%' }}
+          style={{ position: 'absolute', inset: 0 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1.1, ease: EASE, delay: 0.15 }}
+          transition={{ duration: 1.2, ease: EASE, delay: 0.15 }}
         >
           <MapView byDest={byDest} originName={data.meta.origin.name} onPickDest={handlePickDest} mapRef={mapRef} />
         </motion.div>
