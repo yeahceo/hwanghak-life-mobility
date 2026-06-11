@@ -6,6 +6,7 @@ import ModeChart from './components/ModeChart';
 import DestTop10 from './components/DestTop10';
 import DayToggle from './components/DayToggle';
 import CountUp from './components/CountUp';
+import Glow from './components/Glow';
 import { aggregateByDest, modeBreakdown, hourSeries } from './lib/selectors';
 
 // 참고 코드(친구) 무드: blur-in 리빌 + 커스텀 easing
@@ -101,18 +102,18 @@ export default function App() {
           <motion.div className="panel-section" variants={ITEM}>
             <div className="section-title">{data.meta.label} 요약</div>
             <div className="summary-cards">
-              <div className="card">
+              <Glow className="card" glowColor="#58a6ff" glowSize="180px" glowOpacity={0.22}>
                 <div className="k">총 이동인구</div>
                 <div className="v">
                   <CountUp value={currentTotal} /> <small>명</small>
                 </div>
-              </div>
-              <div className="card">
+              </Glow>
+              <Glow className="card" glowColor="#4ecdc4" glowSize="180px" glowOpacity={0.22}>
                 <div className="k">도착지 수</div>
                 <div className="v">
                   <CountUp value={byDest.length} /> <small>곳</small>
                 </div>
-              </div>
+              </Glow>
             </div>
           </motion.div>
 
