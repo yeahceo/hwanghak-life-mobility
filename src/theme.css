@@ -1,0 +1,156 @@
+/* ── 친구 다크 팔레트 재현 ── */
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #30363d;
+  --border-soft: #21262d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-strong: #1f6feb;
+  --origin: #ff6b6b;
+  --seoul: #4ecdc4;
+  --gg: #ffe66d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  font-family: 'Pretendard', 'Malgun Gothic', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── 헤더 ── */
+header {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 13px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 53px;
+}
+header h1 { font-size: 18px; font-weight: 700; color: var(--accent); }
+header .sub { font-size: 13px; color: var(--muted); }
+header .spacer { flex: 1; }
+
+/* ── 평일/주말 토글 ── */
+.day-toggle { display: flex; gap: 0; background: var(--border-soft); border-radius: 8px; padding: 3px; }
+.day-toggle button {
+  position: relative;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.2s;
+}
+.day-toggle button.active { color: #fff; }
+.day-toggle .pill {
+  position: absolute;
+  top: 3px; bottom: 3px;
+  border-radius: 6px;
+  background: var(--accent-strong);
+  z-index: 0;
+}
+
+/* ── 레이아웃 ── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 430px;
+  height: calc(100vh - 53px);
+}
+#map { grid-column: 1; background: #1a1a2e; height: 100%; }
+
+.panel {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+}
+.panel-section { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.section-title {
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-title .sub { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); }
+
+/* ── 요약 카드 ── */
+.summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card {
+  background: var(--border-soft); border-radius: 10px; padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+.card .k { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.card .v { font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
+.card .v small { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+/* ── 시간 슬라이더 ── */
+.time-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+#time-display { font-size: 24px; font-weight: 700; color: var(--accent); min-width: 56px; }
+.time-total { font-size: 13px; color: var(--muted); }
+.slider-row { display: flex; align-items: center; gap: 10px; }
+input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; cursor: pointer; }
+.btn-all {
+  background: var(--border-soft); border: 1px solid var(--border); color: var(--text);
+  padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap;
+  transition: all 0.15s;
+}
+.btn-all:hover { background: var(--border); }
+.btn-all.active { background: var(--accent-strong); border-color: #388bfd; color: #fff; }
+.slider-legend { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; margin-top: 6px; }
+
+/* ── 차트 래퍼 ── */
+.chart-wrap { width: 100%; height: 140px; }
+.chart-wrap.tall { height: 170px; }
+
+/* ── 수단 칩 ── */
+.mode-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.mode-chip {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text);
+  background: var(--border-soft); border: 1px solid var(--border);
+  padding: 4px 10px; border-radius: 20px;
+}
+.mode-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+.mode-chip .pct { color: var(--muted); }
+
+/* ── TOP10 ── */
+.dest-list { display: flex; flex-direction: column; gap: 4px; }
+.dest-row {
+  display: flex; align-items: center; gap: 8px; font-size: 12px;
+  cursor: pointer; padding: 4px 6px; border-radius: 6px;
+}
+.dest-row:hover { background: var(--border-soft); }
+.dest-rank { color: var(--muted); min-width: 16px; text-align: right; font-size: 11px; font-weight: 700; }
+.dest-name { min-width: 110px; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dest-bar-wrap { flex: 1; background: var(--border-soft); border-radius: 4px; height: 11px; overflow: hidden; }
+.dest-bar { height: 100%; border-radius: 4px; }
+.dest-val { color: var(--accent); min-width: 46px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── 범례 ── */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* ── 로딩 ── */
+.loading { display: flex; align-items: center; justify-content: center; height: 100vh; color: var(--muted); font-size: 14px; }
+
+/* Leaflet 팝업 다크 */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #1c2330; color: var(--text); }
+.leaflet-popup-content { font-size: 13px; }
+.leaflet-container { background: #1a1a2e; }
+
+/* 스크롤바 */
+.panel::-webkit-scrollbar { width: 8px; }
+.panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
