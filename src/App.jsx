@@ -8,13 +8,20 @@ import DayToggle from './components/DayToggle';
 import CountUp from './components/CountUp';
 import { aggregateByDest, modeBreakdown, hourSeries } from './lib/selectors';
 
+// 참고 코드(친구) 무드: blur-in 리빌 + 커스텀 easing
+const EASE = [0.25, 0.46, 0.45, 0.94];
 const SECTIONS = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
 };
 const ITEM = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+  hidden: { opacity: 0, y: 12, filter: 'blur(6px)' },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.9, ease: EASE },
+  },
 };
 
 export default function App() {
@@ -57,20 +64,31 @@ export default function App() {
 
   return (
     <>
-      <header>
+      <motion.header
+        initial={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.7, ease: EASE }}
+      >
         <h1>황학동 생활이동</h1>
         <span className="sub">서울시 중구 황학동 출발 · 2026.04</span>
         <span className="spacer" />
         <DayToggle value={day} onChange={setDay} />
-      </header>
+      </motion.header>
 
       <div className="layout">
-        <MapView
-          byDest={byDest}
-          originName={data.meta.origin.name}
-          onPickDest={handlePickDest}
-          mapRef={mapRef}
-        />
+        <motion.div
+          style={{ gridColumn: 1, height: '100%' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.1, ease: EASE, delay: 0.15 }}
+        >
+          <MapView
+            byDest={byDest}
+            originName={data.meta.origin.name}
+            onPickDest={handlePickDest}
+            mapRef={mapRef}
+          />
+        </motion.div>
 
         <motion.div
           className="panel"
