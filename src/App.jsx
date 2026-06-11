@@ -17,10 +17,11 @@ import {
 } from './lib/selectors';
 
 const EASE = [0.25, 0.46, 0.45, 0.94];
-const SECTIONS = { hidden: {}, show: { transition: { staggerChildren: 0.11, delayChildren: 0.08 } } };
+const SECTIONS = { hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } };
+// filter:blur는 부모 backdrop-filter(유리)와 충돌해 깜빡임을 유발 → opacity+y만 사용
 const ITEM = {
-  hidden: { opacity: 0, y: 18, filter: 'blur(8px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: EASE } },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 1.1, ease: EASE } },
 };
 
 const MONTHS = [{ key: 'jan', label: '1월' }, { key: 'apr', label: '4월' }];
@@ -71,9 +72,9 @@ export default function App() {
     <>
       <CursorGlow color="#58a6ff" size={220} opacity={0.28} />
       <motion.header
-        initial={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        transition={{ duration: 0.7, ease: EASE }}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: EASE }}
       >
         <h1>황학동 생활이동</h1>
         <span className="sub">서울시 중구 황학동 출발 · 2026</span>
@@ -92,7 +93,7 @@ export default function App() {
           <MapView byDest={byDest} originName={data.meta.origin.name} onPickDest={handlePickDest} mapRef={mapRef} />
         </motion.div>
 
-        <motion.div className="panel" variants={SECTIONS} initial="hidden" animate="show" key={`${month}_${day}`}>
+        <motion.div className="panel" style={{ opacity: 1 }} variants={SECTIONS} initial="hidden" animate="show">
           {/* 요약 카드 */}
           <motion.div className="panel-section" variants={ITEM}>
             <div className="section-title">{data.meta.label} 요약 <span className="sub">(일평균)</span></div>
