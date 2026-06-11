@@ -4,57 +4,59 @@ import MapView from './components/MapView';
 import TimeChart from './components/TimeChart';
 import ModeChart from './components/ModeChart';
 import DestTop10 from './components/DestTop10';
-import DayToggle from './components/DayToggle';
+import SegToggle from './components/SegToggle';
 import CountUp from './components/CountUp';
 import Glow from './components/Glow';
 import CursorGlow from './components/CursorGlow';
-import { aggregateByDest, modeBreakdown, hourSeries } from './lib/selectors';
+import DistChart from './components/DistChart';
+import NationalityPanel from './components/NationalityPanel';
+import DailyTrend from './components/DailyTrend';
+import {
+  aggregateByDest, modeBreakdown, hourSeries,
+  distBuckets, inoutShare, nationalityTop,
+} from './lib/selectors';
 
-// 참고 코드(친구) 무드: blur-in 리빌 + 커스텀 easing
 const EASE = [0.25, 0.46, 0.45, 0.94];
-const SECTIONS = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-};
+const SECTIONS = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } };
 const ITEM = {
   hidden: { opacity: 0, y: 12, filter: 'blur(6px)' },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    transition: { duration: 0.9, ease: EASE },
-  },
+  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.85, ease: EASE } },
 };
 
+const MONTHS = [{ key: 'jan', label: '1월' }, { key: 'apr', label: '4월' }];
+const DAYS = [{ key: 'weekday', label: '평일' }, { key: 'weekend', label: '주말' }];
+const DATASET_KEYS = ['jan_weekday', 'jan_weekend', 'apr_weekday', 'apr_weekend'];
+
 export default function App() {
-  const [datasets, setDatasets] = useState(null); // { weekday, weekend }
+  const [datasets, setDatasets] = useState(null); // { jan_weekday: {...}, ... }
+  const [daily, setDaily] = useState(null);
+  const [month, setMonth] = useState('apr');
   const [day, setDay] = useState('weekday');
-  const [hour, setHour] = useState(-1); // -1 = 전체
+  const [hour, setHour] = useState(-1);
   const mapRef = useRef(null);
 
   useEffect(() => {
     Promise.all([
-      fetch('data/hwanghak_weekday.json').then((r) => r.json()),
-      fetch('data/hwanghak_weekend.json').then((r) => r.json()),
-    ]).then(([weekday, weekend]) => setDatasets({ weekday, weekend }));
+      ...DATASET_KEYS.map((k) => fetch(`data/hwanghak_${k}.json`).then((r) => r.json())),
+      fetch('data/hwanghak_daily.json').then((r) => r.json()),
+    ]).then((results) => {
+      const dailyData = results.pop();
+      const map = {};
+      DATASET_KEYS.forEach((k, i) => (map[k] = results[i]));
+      setDatasets(map);
+      setDaily(dailyData);
+    });
   }, []);
 
-  const data = datasets?.[day];
+  const data = datasets?.[`${month}_${day}`];
 
-  const byDest = useMemo(
-    () => (data ? aggregateByDest(data.destinations, hour) : []),
-    [data, hour]
-  );
-  const modes = useMemo(
-    () => (data ? modeBreakdown(data.summary, hour, data.meta.mode_labels) : []),
-    [data, hour]
-  );
+  const byDest = useMemo(() => (data ? aggregateByDest(data.destinations, hour) : []), [data, hour]);
+  const modes = useMemo(() => (data ? modeBreakdown(data.summary, hour, data.meta.mode_labels) : []), [data, hour]);
   const series = useMemo(() => (data ? hourSeries(data) : []), [data]);
-
-  const currentTotal = useMemo(
-    () => byDest.reduce((s, d) => s + d.value, 0),
-    [byDest]
-  );
+  const dist = useMemo(() => (data ? distBuckets(data.summary) : []), [data]);
+  const inout = useMemo(() => (data ? inoutShare(data.summary) : []), [data]);
+  const nats = useMemo(() => (data ? nationalityTop(data.summary, 5, true) : []), [data]);
+  const currentTotal = useMemo(() => byDest.reduce((s, d) => s + d.value, 0), [byDest]);
 
   const handlePickDest = (d) => {
     if (d.dest_lat != null) mapRef.current?.setView([d.dest_lat, d.dest_lon], 14);
@@ -63,6 +65,7 @@ export default function App() {
   if (!data) return <div className="loading">데이터 불러오는 중…</div>;
 
   const hourLabel = hour < 0 ? '전체' : `${String(hour).padStart(2, '0')}:00`;
+  const monthLabel = month === 'jan' ? '1월' : '4월';
 
   return (
     <>
@@ -73,9 +76,10 @@ export default function App() {
         transition={{ duration: 0.7, ease: EASE }}
       >
         <h1>황학동 생활이동</h1>
-        <span className="sub">서울시 중구 황학동 출발 · 2026.04</span>
+        <span className="sub">서울시 중구 황학동 출발 · 2026</span>
         <span className="spacer" />
-        <DayToggle value={day} onChange={setDay} />
+        <SegToggle options={MONTHS} value={month} onChange={setMonth} layoutId="month-pill" />
+        <SegToggle options={DAYS} value={day} onChange={setDay} layoutId="day-pill" />
       </motion.header>
 
       <div className="layout">
@@ -85,38 +89,37 @@ export default function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1.1, ease: EASE, delay: 0.15 }}
         >
-          <MapView
-            byDest={byDest}
-            originName={data.meta.origin.name}
-            onPickDest={handlePickDest}
-            mapRef={mapRef}
-          />
+          <MapView byDest={byDest} originName={data.meta.origin.name} onPickDest={handlePickDest} mapRef={mapRef} />
         </motion.div>
 
-        <motion.div
-          className="panel"
-          variants={SECTIONS}
-          initial="hidden"
-          animate="show"
-          key={day}
-        >
+        <motion.div className="panel" variants={SECTIONS} initial="hidden" animate="show" key={`${month}_${day}`}>
           {/* 요약 카드 */}
           <motion.div className="panel-section" variants={ITEM}>
-            <div className="section-title">{data.meta.label} 요약</div>
+            <div className="section-title">{data.meta.label} 요약 <span className="sub">(일평균)</span></div>
             <div className="summary-cards">
               <Glow className="card" glowColor="#58a6ff" glowSize="180px" glowOpacity={0.22}>
                 <div className="k">총 이동인구</div>
-                <div className="v">
-                  <CountUp value={currentTotal} /> <small>명</small>
-                </div>
+                <div className="v"><CountUp value={currentTotal} /> <small>명</small></div>
               </Glow>
               <Glow className="card" glowColor="#4ecdc4" glowSize="180px" glowOpacity={0.22}>
                 <div className="k">도착지 수</div>
-                <div className="v">
-                  <CountUp value={byDest.length} /> <small>곳</small>
-                </div>
+                <div className="v"><CountUp value={byDest.length} /> <small>곳</small></div>
+              </Glow>
+              <Glow className="card" glowColor="#ffe66d" glowSize="180px" glowOpacity={0.2}>
+                <div className="k">평균 이동거리</div>
+                <div className="v"><CountUp value={data.summary.avg_dist / 1000} decimals={1} /> <small>km</small></div>
+              </Glow>
+              <Glow className="card" glowColor="#a78bfa" glowSize="180px" glowOpacity={0.2}>
+                <div className="k">평균 이동시간</div>
+                <div className="v"><CountUp value={data.summary.avg_time} /> <small>분</small></div>
               </Glow>
             </div>
+          </motion.div>
+
+          {/* 일별 추이 */}
+          <motion.div className="panel-section" variants={ITEM}>
+            <div className="section-title">2026 일별 이동인구 추이 <span className="sub">({monthLabel} 강조)</span></div>
+            {daily && <DailyTrend days={daily.days} activeMonth={monthLabel} />}
           </motion.div>
 
           {/* 시간대 슬라이더 */}
@@ -124,29 +127,13 @@ export default function App() {
             <div className="section-title">시간대 필터</div>
             <div className="time-head">
               <div id="time-display">{hourLabel}</div>
-              <div className="time-total">
-                이동인구 <CountUp value={currentTotal} />명
-              </div>
+              <div className="time-total">이동인구 <CountUp value={currentTotal} />명</div>
             </div>
             <div className="slider-row">
-              <input
-                type="range"
-                min="0"
-                max="23"
-                value={hour < 0 ? 0 : hour}
-                onChange={(e) => setHour(Number(e.target.value))}
-              />
-              <button
-                className={`btn-all ${hour < 0 ? 'active' : ''}`}
-                onClick={() => setHour(-1)}
-              >
-                전체
-              </button>
+              <input type="range" min="0" max="23" value={hour < 0 ? 0 : hour} onChange={(e) => setHour(Number(e.target.value))} />
+              <button className={`btn-all ${hour < 0 ? 'active' : ''}`} onClick={() => setHour(-1)}>전체</button>
             </div>
-            <div className="slider-legend">
-              <span>← 0시</span>
-              <span>23시 →</span>
-            </div>
+            <div className="slider-legend"><span>← 0시</span><span>23시 →</span></div>
           </motion.div>
 
           {/* 시간대별 차트 */}
@@ -157,16 +144,27 @@ export default function App() {
 
           {/* 이동수단 */}
           <motion.div className="panel-section" variants={ITEM}>
-            <div className="section-title">
-              이동수단 분포 <span className="sub">({hourLabel})</span>
-            </div>
+            <div className="section-title">이동수단 분포 <span className="sub">({hourLabel})</span></div>
             <ModeChart modes={modes} />
           </motion.div>
 
-          {/* 도착지 TOP10 */}
+          {/* 이동거리 분포 */}
+          <motion.div className="panel-section" variants={ITEM}>
+            <div className="section-title">이동거리 분포</div>
+            <DistChart buckets={dist} />
+          </motion.div>
+
+          {/* 내·외국인 / 국적 */}
+          <motion.div className="panel-section" variants={ITEM}>
+            <div className="section-title">내·외국인 구성</div>
+            <NationalityPanel inout={inout} nationalities={nats} />
+          </motion.div>
+
+          {/* 도착지 TOP10 + 집중도 배지 */}
           <motion.div className="panel-section" variants={ITEM}>
             <div className="section-title">
               도착지 TOP 10 <span className="sub">({hourLabel})</span>
+              {hour < 0 && <span className="badge">TOP3 {data.summary.top3_share}% 집중</span>}
             </div>
             <DestTop10 byDest={byDest} onPick={handlePickDest} />
           </motion.div>

@@ -80,7 +80,7 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
     byDest.slice(0, 40).forEach((d) => {
       if (d.dest_lat == null || d.dest_lon == null) return;
       const ratio = d.value / max;
-      const seoul = isSeoul(d.dest_name);
+      const seoul = isSeoul(d.dest_code);
       const color = seoul ? '#4ecdc4' : '#ffe66d';
       const weight = Math.max(1, ratio * 6);
       const opacity = 0.3 + ratio * 0.6;

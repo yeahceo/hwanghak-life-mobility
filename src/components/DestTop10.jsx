@@ -10,7 +10,7 @@ export default function DestTop10({ byDest, onPick }) {
       <AnimatePresence initial={false}>
         {top.map((d, i) => {
           const pct = (d.value / max) * 100;
-          const color = isSeoul(d.dest_name) ? '#4ecdc4' : '#ffe66d';
+          const color = isSeoul(d.dest_code) ? '#4ecdc4' : '#ffe66d';
           return (
             <motion.div
               key={d.dest_code}

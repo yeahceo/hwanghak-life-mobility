@@ -22,8 +22,9 @@ export default function TimeChart({ series, activeHour, onPickHour }) {
           />
           <Tooltip
             cursor={{ fill: 'rgba(88,166,255,0.08)' }}
-            contentStyle={{ background: '#1c2330', border: '1px solid #30363d', borderRadius: 8, fontSize: 12 }}
-            labelStyle={{ color: '#8b949e' }}
+            contentStyle={{ background: '#1c2330', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
+            labelStyle={{ color: '#e6edf3' }}
+            itemStyle={{ color: '#e6edf3' }}
             labelFormatter={(h) => `${String(h).padStart(2, '0')}:00`}
             formatter={(v) => [`${Number(v).toLocaleString()}명`, '이동인구']}
           />

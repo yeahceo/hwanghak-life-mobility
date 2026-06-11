@@ -69,6 +69,54 @@ export function shortName(name) {
     .replace('인천광역시 ', '인천 ');
 }
 
-export function isSeoul(name) {
-  return name.startsWith('서울');
+// 행정동코드 앞 2자리로 지역 판정 (도착지명은 동명만 있어 이름 판정 불가)
+//  서울=11, 경기=41, 인천=28
+export function regionOf(destCode) {
+  const p = String(destCode).slice(0, 2);
+  if (p === '11') return 'seoul';
+  if (p === '41') return 'gyeonggi';
+  if (p === '28') return 'incheon';
+  return 'etc';
+}
+export function isSeoul(destCode) {
+  return regionOf(destCode) === 'seoul';
+}
+
+// ── 신규 셀렉터: summary 필드 → 차트용 배열 ──
+
+// 거리대 분포 (고정 순서)
+const DIST_ORDER = ['0-1', '1-3', '3-5', '5-10', '10-20', '20+'];
+const DIST_LABEL = { '0-1': '0~1km', '1-3': '1~3km', '3-5': '3~5km', '5-10': '5~10km', '10-20': '10~20km', '20+': '20km+' };
+export function distBuckets(summary) {
+  const b = summary.dist_buckets || {};
+  const sum = DIST_ORDER.reduce((s, k) => s + (b[k] || 0), 0) || 1;
+  return DIST_ORDER.map((k) => ({
+    key: k,
+    label: DIST_LABEL[k],
+    value: Math.round(b[k] || 0),
+    pct: ((b[k] || 0) / sum) * 100,
+  }));
+}
+
+// 내·외국인 비율
+const INOUT_COLOR = { 내국인: '#58a6ff', 단기외국인: '#f4b400', 장기외국인: '#4ecdc4' };
+export function inoutShare(summary) {
+  const o = summary.inout || {};
+  const sum = Object.values(o).reduce((s, v) => s + v, 0) || 1;
+  return ['내국인', '단기외국인', '장기외국인']
+    .filter((k) => o[k])
+    .map((k) => ({ label: k, value: Math.round(o[k]), pct: (o[k] / sum) * 100, color: INOUT_COLOR[k] }));
+}
+
+// 국적 TOP n (한국 제외 옵션 — 외국인 구성 강조)
+export function nationalityTop(summary, n = 5, excludeKorea = true) {
+  const o = { ...(summary.nationality || {}) };
+  if (excludeKorea) delete o['한국'];
+  delete o['기타'];       // 국적 미상 — 국적 비교에서 제외
+  delete o['기타국가'];   // 하위 합산 버킷 제외
+  const sum = Object.values(o).reduce((s, v) => s + v, 0) || 1;
+  return Object.entries(o)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([label, value]) => ({ label, value: Math.round(value), pct: (value / sum) * 100 }));
 }

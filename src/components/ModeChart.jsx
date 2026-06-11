@@ -26,7 +26,9 @@ export default function ModeChart({ modes }) {
               ))}
             </Pie>
             <Tooltip
-              contentStyle={{ background: '#1c2330', border: '1px solid #30363d', borderRadius: 8, fontSize: 12 }}
+              contentStyle={{ background: '#1c2330', border: '1px solid #30363d', borderRadius: 8, fontSize: 12, color: '#e6edf3' }}
+              labelStyle={{ color: '#e6edf3' }}
+              itemStyle={{ color: '#e6edf3' }}
               formatter={(v, n) => [`${Number(v).toLocaleString()}명`, n]}
             />
           </PieChart>
