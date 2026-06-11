@@ -84,14 +84,11 @@ export default function App() {
       </motion.header>
 
       <div className="layout">
-        <motion.div
-          style={{ position: 'absolute', inset: 0 }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, ease: EASE, delay: 0.15 }}
-        >
+        {/* 지도 래퍼: opacity 애니메이션 제거 — 애니 완료 시 stacking 재계산으로
+            패널이 뒤로 들어가던 버그 방지. isolate로 Leaflet z-index도 격리. */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, isolation: 'isolate' }}>
           <MapView byDest={byDest} originName={data.meta.origin.name} onPickDest={handlePickDest} mapRef={mapRef} />
-        </motion.div>
+        </div>
 
         <motion.div className="panel" style={{ opacity: 1 }} variants={SECTIONS} initial="hidden" animate="show">
           {/* 요약 카드 */}
