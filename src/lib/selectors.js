@@ -84,11 +84,11 @@ export function isSeoul(destCode) {
 
 // ── 신규 셀렉터: summary 필드 → 차트용 배열 ──
 
-// 거리대 분포 (고정 순서)
+// 거리대 분포 (고정 순서). hourIdx<0 → 전체, 그 외 → 해당 시간대
 const DIST_ORDER = ['0-1', '1-3', '3-5', '5-10', '10-20', '20+'];
 const DIST_LABEL = { '0-1': '0~1km', '1-3': '1~3km', '3-5': '3~5km', '5-10': '5~10km', '10-20': '10~20km', '20+': '20km+' };
-export function distBuckets(summary) {
-  const b = summary.dist_buckets || {};
+export function distBuckets(summary, hourIdx = -1) {
+  const b = hourIdx < 0 ? (summary.dist_buckets || {}) : (summary.hour_dist?.[hourIdx] || {});
   const sum = DIST_ORDER.reduce((s, k) => s + (b[k] || 0), 0) || 1;
   return DIST_ORDER.map((k) => ({
     key: k,
@@ -98,19 +98,19 @@ export function distBuckets(summary) {
   }));
 }
 
-// 내·외국인 비율
+// 내·외국인 비율. hourIdx<0 → 전체, 그 외 → 해당 시간대
 const INOUT_COLOR = { 내국인: '#58a6ff', 단기외국인: '#f4b400', 장기외국인: '#4ecdc4' };
-export function inoutShare(summary) {
-  const o = summary.inout || {};
+export function inoutShare(summary, hourIdx = -1) {
+  const o = hourIdx < 0 ? (summary.inout || {}) : (summary.hour_inout?.[hourIdx] || {});
   const sum = Object.values(o).reduce((s, v) => s + v, 0) || 1;
   return ['내국인', '단기외국인', '장기외국인']
     .filter((k) => o[k])
     .map((k) => ({ label: k, value: Math.round(o[k]), pct: (o[k] / sum) * 100, color: INOUT_COLOR[k] }));
 }
 
-// 국적 TOP n (한국 제외 옵션 — 외국인 구성 강조)
-export function nationalityTop(summary, n = 5, excludeKorea = true) {
-  const o = { ...(summary.nationality || {}) };
+// 국적 TOP n (한국·미상 제외 — 외국인 구성 강조). hourIdx<0 → 전체
+export function nationalityTop(summary, n = 5, excludeKorea = true, hourIdx = -1) {
+  const o = { ...(hourIdx < 0 ? (summary.nationality || {}) : (summary.hour_nat?.[hourIdx] || {})) };
   if (excludeKorea) delete o['한국'];
   delete o['기타'];       // 국적 미상 — 국적 비교에서 제외
   delete o['기타국가'];   // 하위 합산 버킷 제외

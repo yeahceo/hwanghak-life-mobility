@@ -24,8 +24,10 @@ body {
 
 /* ── 헤더 ── */
 header {
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
+  background: rgba(22, 27, 34, 0.78);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding: 13px 24px;
   display: flex;
   align-items: center;
@@ -64,7 +66,7 @@ header .day-toggle { margin-left: 8px; }
 /* ── 레이아웃 ── */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 430px;
+  grid-template-columns: 1fr 520px;
   height: calc(100vh - 53px);
 }
 #map { grid-column: 1; background: #1a1a2e; height: 100%; }
@@ -73,11 +75,14 @@ header .day-toggle { margin-left: 8px; }
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  background: var(--panel);
-  border-left: 1px solid var(--border);
+  /* 반투명 + 블러로 뒤 지도가 비치게 */
+  background: rgba(22, 27, 34, 0.72);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border-left: 1px solid rgba(88, 166, 255, 0.15);
   overflow-y: auto;
 }
-.panel-section { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.panel-section { padding: 16px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
 .section-title {
   font-size: 12px; font-weight: 700; color: var(--muted);
   text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
@@ -85,11 +90,11 @@ header .day-toggle { margin-left: 8px; }
 }
 .section-title .sub { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); }
 
-/* ── 요약 카드 ── */
-.summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* ── 요약 카드 (넓어진 패널: 4열 한 줄) ── */
+.summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .card {
-  background: var(--border-soft); border-radius: 10px; padding: 12px 14px;
-  border: 1px solid var(--border);
+  background: rgba(33, 38, 45, 0.55); border-radius: 10px; padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .card .k { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
 .card .v { font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }

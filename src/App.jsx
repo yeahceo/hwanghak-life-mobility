@@ -53,9 +53,9 @@ export default function App() {
   const byDest = useMemo(() => (data ? aggregateByDest(data.destinations, hour) : []), [data, hour]);
   const modes = useMemo(() => (data ? modeBreakdown(data.summary, hour, data.meta.mode_labels) : []), [data, hour]);
   const series = useMemo(() => (data ? hourSeries(data) : []), [data]);
-  const dist = useMemo(() => (data ? distBuckets(data.summary) : []), [data]);
-  const inout = useMemo(() => (data ? inoutShare(data.summary) : []), [data]);
-  const nats = useMemo(() => (data ? nationalityTop(data.summary, 5, true) : []), [data]);
+  const dist = useMemo(() => (data ? distBuckets(data.summary, hour) : []), [data, hour]);
+  const inout = useMemo(() => (data ? inoutShare(data.summary, hour) : []), [data, hour]);
+  const nats = useMemo(() => (data ? nationalityTop(data.summary, 5, true, hour) : []), [data, hour]);
   const currentTotal = useMemo(() => byDest.reduce((s, d) => s + d.value, 0), [byDest]);
 
   const handlePickDest = (d) => {
@@ -150,13 +150,13 @@ export default function App() {
 
           {/* 이동거리 분포 */}
           <motion.div className="panel-section" variants={ITEM}>
-            <div className="section-title">이동거리 분포</div>
+            <div className="section-title">이동거리 분포 <span className="sub">({hourLabel})</span></div>
             <DistChart buckets={dist} />
           </motion.div>
 
           {/* 내·외국인 / 국적 */}
           <motion.div className="panel-section" variants={ITEM}>
-            <div className="section-title">내·외국인 구성</div>
+            <div className="section-title">내·외국인 구성 <span className="sub">({hourLabel})</span></div>
             <NationalityPanel inout={inout} nationalities={nats} />
           </motion.div>
 

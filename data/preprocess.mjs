@@ -116,8 +116,12 @@ async function accumulate(date, acc) {
     acc.modeTotals[mode] = (acc.modeTotals[mode] || 0) + pop;
     acc.inout[inout] = (acc.inout[inout] || 0) + pop;
     acc.nat[nat] = (acc.nat[nat] || 0) + pop;
+    acc.hourInout[hour][inout] = (acc.hourInout[hour][inout] || 0) + pop;
+    acc.hourNat[hour][nat] = (acc.hourNat[hour][nat] || 0) + pop;
     if (!Number.isNaN(dist)) {
-      acc.distBuckets[distBucket(dist)] = (acc.distBuckets[distBucket(dist)] || 0) + pop;
+      const bk = distBucket(dist);
+      acc.distBuckets[bk] = (acc.distBuckets[bk] || 0) + pop;
+      acc.hourDist[hour][bk] = (acc.hourDist[hour][bk] || 0) + pop;
       acc.distSum += dist * pop; acc.distW += pop;
     }
     if (!Number.isNaN(tmin)) { acc.timeSum += tmin * pop; acc.timeW += pop; }
@@ -129,6 +133,9 @@ function emptyAcc() {
   return {
     dests: new Map(),
     hourMode: Array.from({ length: 24 }, () => ({})),
+    hourDist: Array.from({ length: 24 }, () => ({})),
+    hourInout: Array.from({ length: 24 }, () => ({})),
+    hourNat: Array.from({ length: 24 }, () => ({})),
     modeTotals: {}, inout: {}, nat: {}, distBuckets: {},
     distSum: 0, distW: 0, timeSum: 0, timeW: 0,
   };
@@ -187,6 +194,10 @@ async function buildDataset(ds) {
       dist_buckets: Object.fromEntries(Object.entries(acc.distBuckets).map(([k, v]) => [k, avg(v)])),
       inout: Object.fromEntries(Object.entries(acc.inout).map(([k, v]) => [k, avg(v)])),
       nationality: topNationalities(Object.fromEntries(Object.entries(acc.nat).map(([k, v]) => [k, v / n]))),
+      // 시간대별 매트릭스 (슬라이더 반응용) — 일평균
+      hour_dist: acc.hourDist.map((m) => Object.fromEntries(Object.entries(m).map(([k, v]) => [k, avg(v)]))),
+      hour_inout: acc.hourInout.map((m) => Object.fromEntries(Object.entries(m).map(([k, v]) => [k, avg(v)]))),
+      hour_nat: acc.hourNat.map((m) => Object.fromEntries(Object.entries(m).map(([k, v]) => [k, avg(v)]))),
       avg_dist: round1(acc.distSum / acc.distW),
       avg_time: round1(acc.timeSum / acc.timeW),
       top3_share: round1((top3 / grand) * 100),
