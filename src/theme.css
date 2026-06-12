@@ -106,16 +106,7 @@ header .day-toggle { margin-left: 8px; }
   position: relative;
   height: calc(100vh - 53px);
 }
-#map { position: absolute; inset: 0; background: #0a0c10; height: 100%; width: 100%; }
-/* 위성 타일 어둡게 — multiply 오버레이 */
-#map::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.48);
-  pointer-events: none;
-  z-index: 400;
-}
+#map { position: absolute; inset: 0; background: #0d0f14; height: 100%; width: 100%; }
 
 /* 떠있는 frosted glass 패널 */
 .panel {
