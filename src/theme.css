@@ -216,18 +216,21 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; cursor: p
 /* ── 모바일 반응형 (≤768px): 지도 위 + 대시보드 아래 세로 스택 ── */
 @media (max-width: 768px) {
   body { overflow: auto; }
-  header { padding: 10px 16px; height: 48px; gap: 10px; }
-  header h1 { font-size: 17px; }
+
+  /* 커서 글로우 숨김 (터치 기기에 불필요) */
+  [aria-hidden="true"][style*="radial-gradient"] { display: none !important; }
+
+  header { padding: 10px 14px; height: auto; gap: 6px; flex-wrap: wrap; }
+  header h1 { font-size: 16px; }
   header .sub { display: none; }
 
   .layout {
     display: flex;
     flex-direction: column;
     height: auto;
-    min-height: calc(100vh - 48px);
+    min-height: calc(100vh - 53px);
   }
 
-  /* 지도: 상단 고정 높이 */
   .layout > div:first-child {
     position: relative !important;
     height: 55vw;
@@ -235,13 +238,8 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; cursor: p
     max-height: 360px;
     flex-shrink: 0;
   }
-  #map {
-    position: absolute !important;
-    inset: 0;
-    height: 100% !important;
-  }
+  #map { position: absolute !important; inset: 0; height: 100% !important; }
 
-  /* 패널: 지도 아래 일반 흐름으로 */
   .panel {
     position: relative !important;
     top: auto; right: auto; bottom: auto;
@@ -253,12 +251,41 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; cursor: p
     -webkit-backdrop-filter: none;
     background: var(--bg);
   }
-
   .noise-overlay { display: none; }
 
-  /* 요약 카드 2열로 */
-  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+  /* 패널 섹션 여백 축소 */
+  .panel-section { padding: 12px 14px; }
+
+  /* 요약 카드 2열 */
+  .summary-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .summary-cards .card .v { font-size: 18px; }
+  .card { padding: 10px 12px; }
+  .card .k { font-size: 11px; }
+
+  /* 시간 헤더 줄바꿈 방지 */
+  .time-head { gap: 8px; }
+  #time-display { font-size: 20px; min-width: 48px; }
+  .time-total { font-size: 12px; }
+
+  /* section-title 줄바꿈 방지 */
+  .section-title { font-size: 12px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+  .section-title .sub { font-size: 11px; }
+  .badge { font-size: 9px; padding: 1px 6px; }
+
+  /* 슬라이더 */
+  .slider-legend { font-size: 10px; }
+
+  /* dest-list 줄바꿈 방지 */
+  .dest-name { min-width: 80px; max-width: 90px; font-size: 12px; }
+  .dest-val { font-size: 12px; min-width: 38px; }
+
+  /* 수단 칩 작게 */
+  .mode-chip { font-size: 11px; padding: 3px 8px; }
+
+  /* 국적/거리 */
+  .nat-name { min-width: 52px; font-size: 12px; }
+  .dist-label { min-width: 44px; font-size: 12px; }
+  .dist-pct { font-size: 12px; min-width: 28px; }
 }
 
 /* Leaflet 팝업 다크 */
