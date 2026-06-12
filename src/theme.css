@@ -25,12 +25,13 @@
   --glass-highlight: rgba(255, 255, 255, 0.18);    /* 상단 광택 */
   --glass-radius: 24px;                            /* 큰 라운드 */
   --glass-radius-sm: 14px;                         /* 카드 라운드 */
-  --glass-shadow:                                  /* 부드럽고 흐릿한 그림자 */
-    0 20px 60px rgba(0, 0, 0, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.25);
-  --glass-inner:
-    inset 0 1px 0 var(--glass-highlight),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --glass-shadow:                                  /* 떠있는 입체 그림자 (다층) */
+    0 30px 70px rgba(0, 0, 0, 0.5),                 /* 멀고 넓게 퍼지는 그림자 */
+    0 10px 24px rgba(0, 0, 0, 0.32),               /* 중간 */
+    0 2px 6px rgba(0, 0, 0, 0.22);                 /* 가까운 또렷한 그림자 */
+  --glass-inner:                                   /* 빛 방향: 위 밝게, 아래 그늘 */
+    inset 0 1px 0 var(--glass-highlight),          /* 상단 빛 받는 면 */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12);            /* 하단 그늘진 면 → 두께감 */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -106,7 +107,7 @@ header .day-toggle { margin-left: 8px; }
   background: var(--glass-tint);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  box-shadow: var(--glass-shadow);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 10;
@@ -137,7 +138,10 @@ header .day-toggle { margin-left: 8px; }
 .card {
   background: var(--glass-tint-strong); border-radius: var(--glass-radius-sm); padding: 12px 14px;
   border: 1px solid var(--glass-border-soft);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  /* 살짝 떠있는 느낌 (유리 위 작은 유리) */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.18);
 }
 .card .k { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
 .card .v { font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
