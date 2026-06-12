@@ -12,20 +12,22 @@
   --seoul: #4ecdc4;
   --gg: #ffe66d;
 
-  /* ── 유리(frosted glass) 디자인 토큰 ── */
-  /* 레퍼런스 글래스모피즘에서 추출 */
-  --glass-blur: 40px;                              /* 백드롭 블러 강도 */
-  --glass-saturate: 130%;                          /* 채도 강조 */
-  --glass-tint: rgba(255, 255, 255, 0.06);         /* 유리 본체 틴트(흰빛) */
-  --glass-tint-strong: rgba(255, 255, 255, 0.10);  /* 카드 등 위에 겹치는 유리 */
-  --glass-border: rgba(255, 255, 255, 0.22);       /* 유리 가장자리(밝은 1px) */
-  --glass-border-soft: rgba(255, 255, 255, 0.10);  /* 내부 구분선 */
+  /* ── 글래스모피즘 디자인 토큰 ── */
+  /* 스펙: 블러 10~20px, 투명도 30~50%, 밝은 테두리 + 부드러운 그림자 */
+  /* 참고: 옵시디언 "글래스모피즘 디자인 토큰.md" */
+  --glass-blur: 16px;                              /* 블러 10~20px 권장 */
+  --glass-blur-sm: 10px;                           /* 작은 요소 */
+  --glass-saturate: 130%;                          /* 채도 강조(유리 너머 색 생생) */
+  --glass-tint: rgba(20, 25, 33, 0.35);            /* 다크 유리 본체(투명도 35%) */
+  --glass-tint-strong: rgba(255, 255, 255, 0.08);  /* 유리 위 겹치는 유리(카드) */
+  --glass-border: rgba(255, 255, 255, 0.25);       /* 유리 가장자리(밝은 1px) */
+  --glass-border-soft: rgba(255, 255, 255, 0.12);  /* 내부 구분선 */
   --glass-highlight: rgba(255, 255, 255, 0.18);    /* 상단 광택 */
-  --glass-radius: 26px;                            /* 큰 라운드 */
+  --glass-radius: 24px;                            /* 큰 라운드 */
   --glass-radius-sm: 14px;                         /* 카드 라운드 */
-  --glass-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+  --glass-shadow:                                  /* 부드럽고 흐릿한 그림자 */
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.25);
   --glass-inner:
     inset 0 1px 0 var(--glass-highlight),
     inset 0 0 0 1px rgba(255, 255, 255, 0.04);
