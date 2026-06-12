@@ -19,7 +19,9 @@ export default function ModeChart({ modes }) {
               paddingAngle={2}
               stroke="none"
               isAnimationActive
-              animationDuration={500}
+              animationBegin={0}
+              animationDuration={280}
+              animationEasingType="ease-out"
             >
               {modes.map((m) => (
                 <Cell key={m.code} fill={m.color} />
@@ -39,9 +41,9 @@ export default function ModeChart({ modes }) {
           <motion.div
             key={m.code}
             className="mode-chip"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04 }}
+            initial={{ opacity: 0, scale: 0.7, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: i * 0.03, duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
           >
             <span className="dot" style={{ background: m.color }} />
             {m.label}
