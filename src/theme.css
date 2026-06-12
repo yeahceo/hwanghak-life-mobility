@@ -15,11 +15,11 @@
   /* ── 글래스모피즘 디자인 토큰 ── */
   /* 스펙: 블러 10~20px, 투명도 30~50%, 밝은 테두리 + 부드러운 그림자 */
   /* 참고: 옵시디언 "글래스모피즘 디자인 토큰.md" */
-  --glass-blur: 16px;                              /* 블러 10~20px 권장 */
-  --glass-blur-sm: 10px;                           /* 작은 요소 */
+  --glass-blur: 24px;                              /* 더 흐릿하게 */
+  --glass-blur-sm: 12px;                           /* 작은 요소 */
   --glass-saturate: 130%;                          /* 채도 강조(유리 너머 색 생생) */
-  --glass-tint: rgba(20, 25, 33, 0.35);            /* 다크 유리 본체(투명도 35%) */
-  --glass-tint-strong: rgba(255, 255, 255, 0.08);  /* 유리 위 겹치는 유리(카드) */
+  --glass-tint: rgba(255, 255, 255, 0.10);         /* 흰 유리 본체(더 하얗고 더 비침) */
+  --glass-tint-strong: rgba(255, 255, 255, 0.14);  /* 유리 위 겹치는 유리(카드) */
   --glass-border: rgba(255, 255, 255, 0.25);       /* 유리 가장자리(밝은 1px) */
   --glass-border-soft: rgba(255, 255, 255, 0.12);  /* 내부 구분선 */
   --glass-highlight: rgba(255, 255, 255, 0.18);    /* 상단 광택 */
@@ -111,6 +111,18 @@ header .day-toggle { margin-left: 8px; }
   overflow-x: hidden;
   z-index: 10;
   isolation: isolate;
+}
+/* 노이즈(그레인) 텍스처 — frosted glass 질감.
+   화면 우측 유리 영역에 고정(fixed)되어 스크롤해도 표면처럼 유지. */
+.noise-overlay {
+  position: fixed;
+  top: 16px; right: 16px; bottom: 16px; width: 540px;
+  border-radius: var(--glass-radius);
+  pointer-events: none;
+  z-index: 11;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 .panel-section { padding: 16px 20px; border-bottom: 1px solid var(--glass-border-soft); position: relative; z-index: 1; }
 .section-title {

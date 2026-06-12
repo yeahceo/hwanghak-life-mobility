@@ -176,6 +176,9 @@ export default function App() {
             </div>
           </motion.div>
         </motion.div>
+
+        {/* 유리 표면 노이즈 (패널 위에 고정) */}
+        <div className="noise-overlay" aria-hidden />
       </div>
     </>
   );
