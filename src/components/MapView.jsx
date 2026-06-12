@@ -37,8 +37,8 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       map.fitBounds(
         [[37.40, 126.75], [37.72, 127.20]],
         isMobile
-          ? { padding: [16, 16], animate: false }
-          : { paddingTopRight: [572, 20], paddingBottomLeft: [20, 20], animate: false }
+          ? { padding: [20, 20], animate: false, maxZoom: 10 }
+          : { paddingTopRight: [572, 20], paddingBottomLeft: [220, 20], animate: false }
       );
     });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
