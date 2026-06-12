@@ -31,9 +31,9 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       zoom: 12,
       zoomControl: true,
     });
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-      attribution: '© Stadia Maps · © OpenMapTiles · © OpenStreetMap',
-      maxZoom: 20,
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter_lite/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap · © CARTO',
+      maxZoom: 19,
     }).addTo(map);
 
     // 서울 자치구 경계 (흐름선보다 아래에 깔림, 구 이름 라벨은 표시 안 함)
