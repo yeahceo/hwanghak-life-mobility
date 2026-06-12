@@ -114,12 +114,6 @@ export default function App() {
             </div>
           </motion.div>
 
-          {/* 일별 추이 */}
-          <motion.div className="panel-section" variants={ITEM}>
-            <div className="section-title">2026 일별 이동인구 추이 <span className="sub">({monthLabel} 강조)</span></div>
-            {daily && <DailyTrend days={daily.days} activeMonth={monthLabel} />}
-          </motion.div>
-
           {/* 시간대 슬라이더 */}
           <motion.div className="panel-section" variants={ITEM}>
             <div className="section-title">시간대 필터</div>
@@ -165,6 +159,12 @@ export default function App() {
               {hour < 0 && <span className="badge">TOP3 {data.summary.top3_share}% 집중</span>}
             </div>
             <DestTop10 byDest={byDest} onPick={handlePickDest} />
+          </motion.div>
+
+          {/* 일별 추이 (맨 아래) */}
+          <motion.div className="panel-section" variants={ITEM}>
+            <div className="section-title">2026 일별 이동인구 추이 <span className="sub">({monthLabel} 강조)</span></div>
+            {daily && <DailyTrend days={daily.days} activeMonth={monthLabel} />}
           </motion.div>
 
           {/* 범례 */}
