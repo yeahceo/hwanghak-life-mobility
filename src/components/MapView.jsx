@@ -34,10 +34,13 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
     // 컨테이너 크기 확정 후 fitBounds — 모바일/데스크탑 패딩 분기
     const isMobile = window.innerWidth <= 768;
     map.whenReady(() => {
+      const bounds = isMobile
+        ? [[37.48, 126.88], [37.62, 127.10]]   // 황학동 주변 줌인
+        : [[37.40, 126.75], [37.72, 127.20]];  // 서울 전체
       map.fitBounds(
-        [[37.40, 126.75], [37.72, 127.20]],
+        bounds,
         isMobile
-          ? { padding: [20, 20], animate: false, maxZoom: 10 }
+          ? { padding: [30, 30], animate: false, maxZoom: 12 }
           : { paddingTopRight: [572, 20], paddingBottomLeft: [220, 20], animate: false }
       );
     });
