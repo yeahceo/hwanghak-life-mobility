@@ -72,7 +72,7 @@ header {
   position: relative;
   z-index: 2;
 }
-header h1 { font-size: 19px; font-weight: 700; color: var(--accent); }
+header h1 { font-size: 21px; font-weight: 700; color: var(--accent); }
 header .sub { font-size: 13.5px; color: var(--muted); }
 header .spacer { flex: 1; }
 header .day-toggle { margin-left: 8px; }
