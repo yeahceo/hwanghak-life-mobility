@@ -18,7 +18,7 @@ function arcPoints(lat1, lon1, lat2, lon2, steps = 30) {
   return pts;
 }
 
-export default function MapView({ byDest, originName, onPickDest, mapRef }) {
+export default function MapView({ byDest, originName, direction = 'out', onPickDest, mapRef }) {
   const layersRef = useRef([]);
   const dotsRef = useRef([]);      // 흐르는 점 마커들
   const animRef = useRef(null);    // requestAnimationFrame id
@@ -95,15 +95,21 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
     dotsRef.current = [];
 
     const max = byDest[0]?.value || 1;
+    const inbound = direction === 'in';
 
     byDest.slice(0, 40).forEach((d) => {
       if (d.dest_lat == null || d.dest_lon == null) return;
       const ratio = d.value / max;
       const seoul = isSeoul(d.dest_code);
-      const color = seoul ? '#4ecdc4' : '#ffe66d';
+      // 유출: 청록/노랑, 유입: 보라/주황 — 방향이 색으로도 구분되게
+      const color = inbound ? (seoul ? '#a78bfa' : '#fb923c') : (seoul ? '#4ecdc4' : '#ffe66d');
       const weight = Math.max(1, ratio * 6);
       const opacity = 0.3 + ratio * 0.6;
-      const pts = arcPoints(ORIGIN.lat, ORIGIN.lon, d.dest_lat, d.dest_lon);
+      // 유입이면 원격지 → 황학동 방향으로 곡선·점 흐름 역전
+      const [aLat, aLon, bLat, bLon] = inbound
+        ? [d.dest_lat, d.dest_lon, ORIGIN.lat, ORIGIN.lon]
+        : [ORIGIN.lat, ORIGIN.lon, d.dest_lat, d.dest_lon];
+      const pts = arcPoints(aLat, aLon, bLat, bLon);
 
       // 글로우용 굵고 흐린 선 (아래에 깔림)
       const glowLine = L.polyline(pts, {
@@ -128,21 +134,21 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
         for (let k = 0; k < dotCount; k++) {
           const el = document.createElement('div');
           el.style.cssText = `width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 6px ${color},0 0 3px ${color};`;
-          const m = L.marker([ORIGIN.lat, ORIGIN.lon], {
+          const m = L.marker([aLat, aLon], {
             interactive: false,
             icon: L.divIcon({ className: '', html: el.outerHTML, iconAnchor: [2.5, 2.5] }),
           }).addTo(map);
           dotsRef.current.push({
             marker: m,
-            o: [ORIGIN.lat, ORIGIN.lon],
-            dst: [d.dest_lat, d.dest_lon],
+            o: [aLat, aLon],                 // 유입이면 원격지에서 출발해 황학동으로
+            dst: [bLat, bLon],
             t: k / dotCount,                 // 시작 위치 분산
             speed: 0.10 + ratio * 0.06,      // 초당 진행률 (느리고 부드럽게)
           });
         }
       }
     });
-  }, [byDest, onPickDest]);
+  }, [byDest, onPickDest, direction]);
 
   // 흐르는 점 애니메이션 루프 — delta time 기반(프레임률 무관, 부드러움)
   useEffect(() => {

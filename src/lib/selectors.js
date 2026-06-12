@@ -8,16 +8,17 @@
 export const ORIGIN = { lat: 37.56853537429577, lon: 127.02084550975484 };
 
 // 수단 색상 (지하철/도보/버스 계열 구분)
+// 2026 데이터는 숫자 코드, 2023/2024 cleaned 데이터는 텍스트 키 — 둘 다 지원
 export const MODE_COLORS = {
-  1: '#a78bfa', // 항공
-  2: '#f472b6', // 기차
-  3: '#fb923c', // 고속버스
-  4: '#fbbf24', // 광역버스
-  5: '#34d399', // 일반버스
-  6: '#58a6ff', // 지하철
-  7: '#4ecdc4', // 도보
-  8: '#f87171', // 차량
-  9: '#8b949e', // 기타
+  1: '#a78bfa', 항공: '#a78bfa',
+  2: '#f472b6', 기차: '#f472b6',
+  3: '#fb923c', 고속버스: '#fb923c',
+  4: '#fbbf24', 광역버스: '#fbbf24',
+  5: '#34d399', 일반버스: '#34d399',
+  6: '#58a6ff', 지하철: '#58a6ff',
+  7: '#4ecdc4', 도보: '#4ecdc4',
+  8: '#f87171', 차량: '#f87171',
+  9: '#8b949e', 기타: '#8b949e',
 };
 
 // idx: -1 = 전체, 0~23 = 해당 시
@@ -62,8 +63,20 @@ export function hourSeries(data) {
   }));
 }
 
+// 시간대별 유출+유입 듀얼 (value=현재 방향, value2=반대 방향)
+// — "18시 유입 역전" 인사이트의 시각적 증거
+export function hourSeriesDual(data, oppData) {
+  return data.meta.hours.map((label, h) => ({
+    hour: h,
+    label,
+    value: Math.round((data.summary.hour_totals[h] || 0) * 10) / 10,
+    value2: oppData ? Math.round((oppData.summary.hour_totals[h] || 0) * 10) / 10 : null,
+  }));
+}
+
 export function shortName(name) {
   return name
+    .replace('서울특별시 ', '')
     .replace('서울시 ', '')
     .replace('경기도 ', '경기 ')
     .replace('인천광역시 ', '인천 ');

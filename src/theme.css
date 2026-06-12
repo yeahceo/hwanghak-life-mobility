@@ -72,8 +72,12 @@ header {
   position: relative;
   z-index: 2;
 }
-header h1 { font-size: 21px; font-weight: 700; color: var(--accent); }
-header .sub { font-size: 13.5px; color: var(--muted); }
+header h1 { font-size: 21px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+header .sub { font-size: 13.5px; color: var(--muted); white-space: nowrap; }
+/* 토글 4개(연도·월·요일·방향)가 들어가면 좁은 화면에선 sub 숨김 */
+@media (max-width: 1480px) {
+  header .sub { display: none; }
+}
 header .spacer { flex: 1; }
 header .day-toggle { margin-left: 8px; }
 
@@ -147,6 +151,18 @@ header .day-toggle { margin-left: 8px; }
   display: flex; align-items: center; justify-content: space-between;
 }
 .section-title .sub { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); }
+
+/* 도시설계 인사이트 캡션 — 각 섹션 하단 주석 */
+.insight-note {
+  margin-top: 10px;
+  padding: 7px 10px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: rgba(230, 237, 243, 0.66);
+  background: rgba(88, 166, 255, 0.06);
+  border-left: 2px solid rgba(88, 166, 255, 0.4);
+  border-radius: 0 8px 8px 0;
+}
 
 /* ── 요약 카드 (넓어진 패널: 4열 한 줄) ── */
 .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
