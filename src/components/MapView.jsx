@@ -31,18 +31,29 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       center: [37.56, 127.0],
       zoom: 11,
     });
-    // 컨테이너 크기 확정 후 fitBounds — 모바일/데스크탑 패딩 분기
+    // 컨테이너 크기 확정 후 중심 설정
     const isMobile = window.innerWidth <= 768;
     map.whenReady(() => {
-      const bounds = isMobile
-        ? [[37.48, 126.88], [37.62, 127.10]]   // 황학동 주변 줌인
-        : [[37.40, 126.75], [37.72, 127.20]];  // 서울 전체
-      map.fitBounds(
-        bounds,
-        isMobile
-          ? { padding: [30, 30], animate: false, maxZoom: 12 }
-          : { paddingTopRight: [572, 20], paddingBottomLeft: [420, 20], animate: false }
-      );
+      if (isMobile) {
+        // 모바일: 황학동 중심, 적당한 줌
+        map.setView([ORIGIN.lat, ORIGIN.lon], 12, { animate: false });
+      } else {
+        // 데스크탑: 황학동을 좌측 빈 공간(전체 - 572px) 의 1/3 지점에 배치
+        // 지도 중심을 황학동보다 오른쪽으로 이동 = 패널 절반(286px)만큼 경도 오프셋
+        const zoom = 11;
+        map.setView([ORIGIN.lat, ORIGIN.lon], zoom, { animate: false });
+        // 픽셀 오프셋으로 패널 중심만큼 이동: 오른쪽 286px 상당
+        const offset = map.containerPointToLatLng([
+          map.getSize().x / 2 + 286,
+          map.getSize().y / 2,
+        ]);
+        const center = map.getCenter();
+        map.setView(
+          [center.lat, center.lng + (center.lng - offset.lng)],
+          zoom,
+          { animate: false }
+        );
+      }
     });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap · © CARTO',
