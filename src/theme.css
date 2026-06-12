@@ -102,24 +102,15 @@ header .day-toggle { margin-left: 8px; }
   display: flex;
   flex-direction: column;
   border-radius: var(--glass-radius);
-  /* 유리 토큰 적용 */
+  /* 유리 토큰 적용 (테두리선·상단 광택 제거) */
   background: var(--glass-tint);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-inner);
+  box-shadow: var(--glass-shadow);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 10;
   isolation: isolate;
-}
-/* 상단 광택 하이라이트 (유리 느낌) */
-.panel::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 140px;
-  background: linear-gradient(180deg, var(--glass-highlight), transparent);
-  pointer-events: none; z-index: 0;
-  border-radius: var(--glass-radius) var(--glass-radius) 0 0;
 }
 .panel-section { padding: 16px 20px; border-bottom: 1px solid var(--glass-border-soft); position: relative; z-index: 1; }
 .section-title {
