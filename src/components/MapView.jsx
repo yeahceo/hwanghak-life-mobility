@@ -27,12 +27,13 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
   // 지도 1회 초기화
   useEffect(() => {
     const map = L.map(containerRef.current, {
-      center: [37.5665, 127.0],
-      zoom: 12,
       zoomControl: true,
-      // 패널(540px + 여백 16px*2) 만큼 오른쪽을 비워 지도 콘텐츠가 좌측 영역 중앙에 오게
-      paddingTopRight: [572, 0],
     });
+    // 패널 너비(540) + 여백(32) 만큼 오른쪽 패딩 → 서울 영역이 좌측 빈 공간 중앙에 위치
+    map.fitBounds(
+      [[37.42, 126.76], [37.70, 127.18]],
+      { paddingTopRight: [572, 20], paddingBottomLeft: [20, 20], animate: false }
+    );
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap · © CARTO',
       maxZoom: 18,
