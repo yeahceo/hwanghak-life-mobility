@@ -29,9 +29,21 @@
     0 30px 70px rgba(0, 0, 0, 0.5),                 /* 멀고 넓게 퍼지는 그림자 */
     0 10px 24px rgba(0, 0, 0, 0.32),               /* 중간 */
     0 2px 6px rgba(0, 0, 0, 0.22);                 /* 가까운 또렷한 그림자 */
-  --glass-inner:                                   /* 빛 방향: 위 밝게, 아래 그늘 */
-    inset 0 1px 0 var(--glass-highlight),          /* 상단 빛 받는 면 */
-    inset 0 -1px 0 rgba(0, 0, 0, 0.12);            /* 하단 그늘진 면 → 두께감 */
+  /* ── 입체감: 가장자리 빛 띠 + 표면 sheen (렌즈 유리 참고) ── */
+  --glass-edge: rgba(255, 255, 255, 0.45);         /* 가장자리 강한 빛 띠 */
+  --glass-inner:                                   /* 4면 빛 띠 → 볼록한 두께감 */
+    inset 0 1px 0 var(--glass-edge),               /* 상단(강) */
+    inset 1px 0 0 rgba(255, 255, 255, 0.15),       /* 좌 */
+    inset -1px 0 0 rgba(255, 255, 255, 0.15),      /* 우 */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);            /* 하단 그늘(두께감) */
+  /* 표면 빛 그라데이션: 위 밝음 → 아래 그늘 */
+  --glass-sheen: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -103,8 +115,8 @@ header .day-toggle { margin-left: 8px; }
   display: flex;
   flex-direction: column;
   border-radius: var(--glass-radius);
-  /* 유리 토큰 적용 (테두리선·상단 광택 제거) */
-  background: var(--glass-tint);
+  /* 유리 토큰: 표면 sheen(위 밝고 아래 그늘) + 틴트 */
+  background: var(--glass-sheen), var(--glass-tint);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--glass-shadow), var(--glass-inner);
