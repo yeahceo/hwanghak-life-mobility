@@ -25,7 +25,7 @@ export default function CursorGlow({ color = '#58a6ff', size = 420, opacity = 0.
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
     // 중심을 또렷하게: 밝은 코어 → 빠르게 투명
-    return `radial-gradient(${size}px circle at ${x}px ${y}px, rgba(${r},${g},${b},${opacity}) 0%, rgba(${r},${g},${b},${opacity * 0.4}) 30%, transparent 60%)`;
+    return `radial-gradient(${size}px circle at ${x}px ${y}px, rgba(${r},${g},${b},${opacity}) 0%, rgba(${r},${g},${b},${opacity * 0.6}) 12%, rgba(${r},${g},${b},${opacity * 0.25}) 35%, rgba(${r},${g},${b},0.03) 65%, transparent 100%)`;
   });
 
   return (

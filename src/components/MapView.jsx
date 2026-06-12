@@ -30,6 +30,8 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       center: [37.5665, 127.0],
       zoom: 12,
       zoomControl: true,
+      // 패널(540px + 여백 16px*2) 만큼 오른쪽을 비워 지도 콘텐츠가 좌측 영역 중앙에 오게
+      paddingTopRight: [572, 0],
     });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap · © CARTO',

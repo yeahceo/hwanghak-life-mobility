@@ -213,6 +213,54 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; cursor: p
 /* ── 로딩 ── */
 .loading { display: flex; align-items: center; justify-content: center; height: 100vh; color: var(--muted); font-size: 14px; }
 
+/* ── 모바일 반응형 (≤768px): 지도 위 + 대시보드 아래 세로 스택 ── */
+@media (max-width: 768px) {
+  body { overflow: auto; }
+  header { padding: 10px 16px; height: 48px; gap: 10px; }
+  header h1 { font-size: 17px; }
+  header .sub { display: none; }
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 48px);
+  }
+
+  /* 지도: 상단 고정 높이 */
+  .layout > div:first-child {
+    position: relative !important;
+    height: 55vw;
+    min-height: 240px;
+    max-height: 360px;
+    flex-shrink: 0;
+  }
+  #map {
+    position: absolute !important;
+    inset: 0;
+    height: 100% !important;
+  }
+
+  /* 패널: 지도 아래 일반 흐름으로 */
+  .panel {
+    position: relative !important;
+    top: auto; right: auto; bottom: auto;
+    width: 100% !important;
+    border-radius: 0;
+    overflow-y: visible;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--bg);
+  }
+
+  .noise-overlay { display: none; }
+
+  /* 요약 카드 2열로 */
+  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+  .summary-cards .card .v { font-size: 18px; }
+}
+
 /* Leaflet 팝업 다크 */
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #1c2330; color: var(--text); }
 .leaflet-popup-content { font-size: 13px; }
