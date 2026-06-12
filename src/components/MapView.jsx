@@ -31,9 +31,9 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       zoom: 12,
       zoomControl: true,
     });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter_lite/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap · © CARTO',
-      maxZoom: 19,
+      maxZoom: 18,
     }).addTo(map);
 
     // 서울 자치구 경계 (흐름선보다 아래에 깔림, 구 이름 라벨은 표시 안 함)
@@ -43,11 +43,11 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
         if (!mapRef.current) return;
         L.geoJSON(geo, {
           style: {
-            color: 'rgba(255,255,255,0.55)',
-            weight: 1.2,
-            opacity: 0.8,
-            fillColor: 'transparent',
-            fillOpacity: 0,
+            color: '#3a4a63',
+            weight: 1,
+            opacity: 0.7,
+            fillColor: '#4a5a78',
+            fillOpacity: 0.04,
           },
         }).addTo(map);
       })

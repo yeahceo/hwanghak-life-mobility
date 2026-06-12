@@ -18,8 +18,8 @@
   --glass-blur: 24px;                              /* 더 흐릿하게 */
   --glass-blur-sm: 12px;                           /* 작은 요소 */
   --glass-saturate: 130%;                          /* 채도 강조(유리 너머 색 생생) */
-  --glass-tint: rgba(255, 255, 255, 0.08);          /* 흰 유리 틴트 */
-  --glass-tint-strong: rgba(255, 255, 255, 0.11);  /* 카드 */
+  --glass-tint: rgba(255, 255, 255, 0.10);         /* 흰 유리 본체(더 하얗고 더 비침) */
+  --glass-tint-strong: rgba(255, 255, 255, 0.14);  /* 유리 위 겹치는 유리(카드) */
   --glass-border: rgba(255, 255, 255, 0.25);       /* 유리 가장자리(밝은 1px) */
   --glass-border-soft: rgba(255, 255, 255, 0.12);  /* 내부 구분선 */
   --glass-highlight: rgba(255, 255, 255, 0.18);    /* 상단 광택 */
@@ -30,19 +30,19 @@
     0 10px 24px rgba(0, 0, 0, 0.32),               /* 중간 */
     0 2px 6px rgba(0, 0, 0, 0.22);                 /* 가까운 또렷한 그림자 */
   /* ── 입체감: 가장자리 빛 띠 + 표면 sheen (렌즈 유리 참고) ── */
-  --glass-edge: rgba(255, 255, 255, 0.45);
-  --glass-inner:
-    inset 0 1px 0 var(--glass-edge),
-    inset 1px 0 0 rgba(255, 255, 255, 0.15),
-    inset -1px 0 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
-  /* 상단 sheen 강화 — 위 22% 밝음, 빠르게 투명으로 */
+  --glass-edge: rgba(255, 255, 255, 0.45);         /* 가장자리 강한 빛 띠 */
+  --glass-inner:                                   /* 4면 빛 띠 → 볼록한 두께감 */
+    inset 0 1px 0 var(--glass-edge),               /* 상단(강) */
+    inset 1px 0 0 rgba(255, 255, 255, 0.15),       /* 좌 */
+    inset -1px 0 0 rgba(255, 255, 255, 0.15),      /* 우 */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);            /* 하단 그늘(두께감) */
+  /* 표면 빛 그라데이션: 위 밝음 → 아래 그늘 */
   --glass-sheen: linear-gradient(
-    175deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.08) 18%,
-    transparent 38%,
-    rgba(0, 0, 0, 0.06) 100%
+    160deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.05) 100%
   );
 }
 
@@ -106,7 +106,7 @@ header .day-toggle { margin-left: 8px; }
   position: relative;
   height: calc(100vh - 53px);
 }
-#map { position: absolute; inset: 0; background: #0d0f14; height: 100%; width: 100%; }
+#map { position: absolute; inset: 0; background: #1a1a2e; height: 100%; width: 100%; }
 
 /* 떠있는 frosted glass 패널 */
 .panel {
@@ -118,50 +118,15 @@ header .day-toggle { margin-left: 8px; }
   display: flex;
   flex-direction: column;
   border-radius: var(--glass-radius);
+  /* 유리 토큰: 표면 sheen(위 밝고 아래 그늘) + 틴트 */
   background: var(--glass-sheen), var(--glass-tint);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  /* ambient shadow: 패널보다 크게 퍼지는 glow + 다층 깊이감 */
-  box-shadow:
-    var(--glass-inner),
-    0 0 0 1px rgba(255, 255, 255, 0.07),
-    0 8px 32px rgba(0, 0, 0, 0.55),
-    0 32px 80px rgba(0, 0, 0, 0.4),
-    0 64px 120px rgba(0, 0, 0, 0.25),
-    0 0 80px rgba(255, 255, 255, 0.04);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 10;
   isolation: isolate;
-}
-/* 가장자리 넓은 그라데이션 빛 띠 — outline 레이어로 안정적 렌더링 */
-.panel::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: calc(var(--glass-radius) + 1px);
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.50) 0%,
-    rgba(255, 255, 255, 0.22) 18%,
-    rgba(255, 255, 255, 0.05) 40%,
-    rgba(255, 255, 255, 0.00) 55%,
-    rgba(255, 255, 255, 0.08) 75%,
-    rgba(255, 255, 255, 0.26) 100%
-  );
-  /* 안쪽 잘라내기: 패널 내부는 투명하게, 테두리 띠만 남김 */
-  -webkit-mask: radial-gradient(
-    farthest-side at 50% 50%,
-    transparent calc(100% - 2px),
-    #fff calc(100% - 2px)
-  );
-  mask: radial-gradient(
-    farthest-side at 50% 50%,
-    transparent calc(100% - 2px),
-    #fff calc(100% - 2px)
-  );
-  pointer-events: none;
-  z-index: 12;
 }
 /* 노이즈(그레인) 텍스처 — frosted glass 질감.
    화면 우측 유리 영역에 고정(fixed)되어 스크롤해도 표면처럼 유지. */
@@ -175,7 +140,7 @@ header .day-toggle { margin-left: 8px; }
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
-.panel-section { padding: 14px 20px; border-bottom: 1px solid var(--glass-border-soft); position: relative; z-index: 1; }
+.panel-section { padding: 16px 20px; border-bottom: 1px solid var(--glass-border-soft); position: relative; z-index: 1; }
 .section-title {
   font-size: 13px; font-weight: 700; color: var(--muted);
   letter-spacing: 0.1px; margin-bottom: 12px;
@@ -216,17 +181,15 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; cursor: p
 .chart-wrap { width: 100%; height: 140px; }
 .chart-wrap.tall { height: 170px; }
 
-/* ── 이동수단: 도넛 왼쪽 + 칩 오른쪽 나란히 ── */
-.mode-layout { display: flex; align-items: center; gap: 12px; }
-.mode-donut { width: 130px; height: 130px; flex-shrink: 0; }
-.mode-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; align-content: flex-start; }
+/* ── 수단 칩 ── */
+.mode-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .mode-chip {
   display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--text);
+  font-size: 12.5px; color: var(--text);
   background: var(--border-soft); border: 1px solid var(--border);
-  padding: 3px 9px; border-radius: 20px;
+  padding: 4px 10px; border-radius: 20px;
 }
-.mode-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.mode-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
 .mode-chip .pct { color: var(--muted); }
 
 /* ── TOP10 ── */
@@ -281,12 +244,12 @@ input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; cursor: p
 .dist-pct { min-width: 34px; text-align: right; color: var(--accent); font-variant-numeric: tabular-nums; }
 
 /* ── 내·외국인 스택 바 ── */
-.stack-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--border-soft); }
+.stack-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; background: var(--border-soft); }
 .stack-seg { height: 100%; }
-.stack-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; font-size: 12.5px; color: var(--text); }
-.stack-legend-item { display: flex; align-items: center; gap: 5px; }
-.stack-legend-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.foreigner-note { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.stack-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 13px; color: var(--text); }
+.stack-legend-item { display: flex; align-items: center; gap: 6px; }
+.stack-legend-item .dot { width: 8px; height: 8px; border-radius: 50%; }
+.foreigner-note { margin-top: 8px; font-size: 13px; color: var(--muted); }
 .foreigner-note b { color: var(--accent); }
 
 /* ── 국적 TOP5 ── */

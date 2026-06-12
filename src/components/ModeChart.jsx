@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 export default function ModeChart({ modes }) {
   const total = modes.reduce((s, m) => s + m.value, 0);
   return (
-    <div className="mode-layout">
-      <div className="mode-donut">
+    <div>
+      <div className="chart-wrap" style={{ height: 150 }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -14,8 +14,8 @@ export default function ModeChart({ modes }) {
               nameKey="label"
               cx="50%"
               cy="50%"
-              innerRadius={38}
-              outerRadius={58}
+              innerRadius={42}
+              outerRadius={66}
               paddingAngle={2}
               stroke="none"
               isAnimationActive
@@ -39,8 +39,8 @@ export default function ModeChart({ modes }) {
           <motion.div
             key={m.code}
             className="mode-chip"
-            initial={{ opacity: 0, x: 6 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
           >
             <span className="dot" style={{ background: m.color }} />

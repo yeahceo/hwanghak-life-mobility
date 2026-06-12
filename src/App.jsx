@@ -70,7 +70,7 @@ export default function App() {
 
   return (
     <>
-      <CursorGlow color="#ffffff" size={180} opacity={0.28} />
+      <CursorGlow color="#ffffff" size={220} opacity={0.18} />
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
