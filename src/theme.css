@@ -18,8 +18,8 @@
   --glass-blur: 24px;                              /* 더 흐릿하게 */
   --glass-blur-sm: 12px;                           /* 작은 요소 */
   --glass-saturate: 130%;                          /* 채도 강조(유리 너머 색 생생) */
-  --glass-tint: rgba(255, 255, 255, 0.10);         /* 흰 유리 본체(더 하얗고 더 비침) */
-  --glass-tint-strong: rgba(255, 255, 255, 0.14);  /* 유리 위 겹치는 유리(카드) */
+  --glass-tint: rgba(10, 14, 20, 0.52);            /* 위성 배경 위 — 충분히 어둡게 */
+  --glass-tint-strong: rgba(255, 255, 255, 0.08);  /* 카드 */
   --glass-border: rgba(255, 255, 255, 0.25);       /* 유리 가장자리(밝은 1px) */
   --glass-border-soft: rgba(255, 255, 255, 0.12);  /* 내부 구분선 */
   --glass-highlight: rgba(255, 255, 255, 0.18);    /* 상단 광택 */
@@ -30,19 +30,19 @@
     0 10px 24px rgba(0, 0, 0, 0.32),               /* 중간 */
     0 2px 6px rgba(0, 0, 0, 0.22);                 /* 가까운 또렷한 그림자 */
   /* ── 입체감: 가장자리 빛 띠 + 표면 sheen (렌즈 유리 참고) ── */
-  --glass-edge: rgba(255, 255, 255, 0.45);         /* 가장자리 강한 빛 띠 */
-  --glass-inner:                                   /* 4면 빛 띠 → 볼록한 두께감 */
-    inset 0 1px 0 var(--glass-edge),               /* 상단(강) */
-    inset 1px 0 0 rgba(255, 255, 255, 0.15),       /* 좌 */
-    inset -1px 0 0 rgba(255, 255, 255, 0.15),      /* 우 */
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18);            /* 하단 그늘(두께감) */
-  /* 표면 빛 그라데이션: 위 밝음 → 아래 그늘 */
+  --glass-edge: rgba(255, 255, 255, 0.45);
+  --glass-inner:
+    inset 0 1px 0 var(--glass-edge),
+    inset 1px 0 0 rgba(255, 255, 255, 0.15),
+    inset -1px 0 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  /* 상단 sheen 강화 — 위 22% 밝음, 빠르게 투명으로 */
   --glass-sheen: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.04) 30%,
-    transparent 60%,
-    rgba(0, 0, 0, 0.05) 100%
+    175deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 18%,
+    transparent 38%,
+    rgba(0, 0, 0, 0.06) 100%
   );
 }
 
@@ -118,15 +118,45 @@ header .day-toggle { margin-left: 8px; }
   display: flex;
   flex-direction: column;
   border-radius: var(--glass-radius);
-  /* 유리 토큰: 표면 sheen(위 밝고 아래 그늘) + 틴트 */
   background: var(--glass-sheen), var(--glass-tint);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  box-shadow: var(--glass-shadow), var(--glass-inner);
+  /* ambient shadow: 패널보다 크게 퍼지는 glow + 다층 깊이감 */
+  box-shadow:
+    var(--glass-inner),
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 8px 32px rgba(0, 0, 0, 0.55),
+    0 32px 80px rgba(0, 0, 0, 0.4),
+    0 64px 120px rgba(0, 0, 0, 0.25),
+    0 0 80px rgba(255, 255, 255, 0.04);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 10;
   isolation: isolate;
+}
+/* 가장자리 넓은 그라데이션 빛 띠 — 좌상단 강 → 우하단 은은 */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.25) 20%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0.00) 60%,
+    rgba(255, 255, 255, 0.10) 80%,
+    rgba(255, 255, 255, 0.28) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
 }
 /* 노이즈(그레인) 텍스처 — frosted glass 질감.
    화면 우측 유리 영역에 고정(fixed)되어 스크롤해도 표면처럼 유지. */

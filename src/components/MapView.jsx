@@ -31,9 +31,16 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
       zoom: 12,
       zoomControl: true,
     });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap · © CARTO',
+    // 어두운 위성 타일 — ESRI World Imagery (무료, 고해상도)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '© Esri · Earthstar Geographics',
       maxZoom: 18,
+    }).addTo(map);
+    // 위성 위에 도로/라벨 오버레이 (반투명)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '',
+      maxZoom: 18,
+      opacity: 0.35,
     }).addTo(map);
 
     // 서울 자치구 경계 (흐름선보다 아래에 깔림, 구 이름 라벨은 표시 안 함)
@@ -43,11 +50,11 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
         if (!mapRef.current) return;
         L.geoJSON(geo, {
           style: {
-            color: '#3a4a63',
-            weight: 1,
-            opacity: 0.7,
-            fillColor: '#4a5a78',
-            fillOpacity: 0.04,
+            color: 'rgba(255,255,255,0.55)',
+            weight: 1.2,
+            opacity: 0.8,
+            fillColor: 'transparent',
+            fillOpacity: 0,
           },
         }).addTo(map);
       })
