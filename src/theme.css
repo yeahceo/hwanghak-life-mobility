@@ -18,8 +18,8 @@
   --glass-blur: 24px;                              /* 더 흐릿하게 */
   --glass-blur-sm: 12px;                           /* 작은 요소 */
   --glass-saturate: 130%;                          /* 채도 강조(유리 너머 색 생생) */
-  --glass-tint: rgba(10, 14, 20, 0.52);            /* 위성 배경 위 — 충분히 어둡게 */
-  --glass-tint-strong: rgba(255, 255, 255, 0.08);  /* 카드 */
+  --glass-tint: rgba(255, 255, 255, 0.08);          /* 흰 유리 틴트 */
+  --glass-tint-strong: rgba(255, 255, 255, 0.11);  /* 카드 */
   --glass-border: rgba(255, 255, 255, 0.25);       /* 유리 가장자리(밝은 1px) */
   --glass-border-soft: rgba(255, 255, 255, 0.12);  /* 내부 구분선 */
   --glass-highlight: rgba(255, 255, 255, 0.18);    /* 상단 광택 */
@@ -134,29 +134,34 @@ header .day-toggle { margin-left: 8px; }
   z-index: 10;
   isolation: isolate;
 }
-/* 가장자리 넓은 그라데이션 빛 띠 — 좌상단 강 → 우하단 은은 */
+/* 가장자리 넓은 그라데이션 빛 띠 — outline 레이어로 안정적 렌더링 */
 .panel::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1.5px;
+  inset: -1px;
+  border-radius: calc(var(--glass-radius) + 1px);
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.25) 20%,
-    rgba(255, 255, 255, 0.06) 45%,
-    rgba(255, 255, 255, 0.00) 60%,
-    rgba(255, 255, 255, 0.10) 80%,
-    rgba(255, 255, 255, 0.28) 100%
+    rgba(255, 255, 255, 0.50) 0%,
+    rgba(255, 255, 255, 0.22) 18%,
+    rgba(255, 255, 255, 0.05) 40%,
+    rgba(255, 255, 255, 0.00) 55%,
+    rgba(255, 255, 255, 0.08) 75%,
+    rgba(255, 255, 255, 0.26) 100%
   );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  /* 안쪽 잘라내기: 패널 내부는 투명하게, 테두리 띠만 남김 */
+  -webkit-mask: radial-gradient(
+    farthest-side at 50% 50%,
+    transparent calc(100% - 2px),
+    #fff calc(100% - 2px)
+  );
+  mask: radial-gradient(
+    farthest-side at 50% 50%,
+    transparent calc(100% - 2px),
+    #fff calc(100% - 2px)
+  );
   pointer-events: none;
-  z-index: 0;
+  z-index: 12;
 }
 /* 노이즈(그레인) 텍스처 — frosted glass 질감.
    화면 우측 유리 영역에 고정(fixed)되어 스크롤해도 표면처럼 유지. */
