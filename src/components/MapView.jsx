@@ -41,18 +41,13 @@ export default function MapView({ byDest, originName, onPickDest, mapRef }) {
         // 데스크탑: 황학동을 좌측 빈 공간(전체 - 572px) 의 1/3 지점에 배치
         // 지도 중심을 황학동보다 오른쪽으로 이동 = 패널 절반(286px)만큼 경도 오프셋
         const zoom = 11;
+        // 황학동 기준으로 패널 절반(286px)만큼 오른쪽으로 지도 중심 이동
+        // → 황학동이 좌측 빈 공간(전체 - 572px)의 중앙에 위치
         map.setView([ORIGIN.lat, ORIGIN.lon], zoom, { animate: false });
-        // 픽셀 오프셋으로 패널 중심만큼 이동: 오른쪽 286px 상당
-        const offset = map.containerPointToLatLng([
-          map.getSize().x / 2 + 286,
-          map.getSize().y / 2,
-        ]);
-        const center = map.getCenter();
-        map.setView(
-          [center.lat, center.lng + (center.lng - offset.lng)],
-          zoom,
-          { animate: false }
-        );
+        const originPx = map.latLngToContainerPoint([ORIGIN.lat, ORIGIN.lon]);
+        const newCenterPx = [originPx.x + 286, originPx.y];
+        const newCenter = map.containerPointToLatLng(newCenterPx);
+        map.setView(newCenter, zoom, { animate: false });
       }
     });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
